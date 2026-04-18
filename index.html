@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contact Us</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 500px; margin: 60px auto; padding: 20px; }
+    h1 { color: #333; }
+    label { display: block; margin-top: 15px; font-weight: 600; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+    button { margin-top: 20px; padding: 12px 24px; background: #0066ff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #0052cc; }
+    #status { margin-top: 20px; padding: 10px; border-radius: 6px; display: none; }
+    .success { background: #d4edda; color: #155724; display: block !important; }
+    .error { background: #f8d7da; color: #721c24; display: block !important; }
+  </style>
+</head>
+<body>
+  <h1>Contact Us</h1>
+  <p>Fill out the form and we'll get back to you.</p>
+
+  <form id="contactForm">
+    <label for="name">Name</label>
+    <input type="text" id="name" required />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" required />
+
+    <label for="message">Message</label>
+    <textarea id="message" rows="5" required></textarea>
+
+    <button type="submit">Send Message</button>
+  </form>
+
+  <div id="status"></div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    // ⚠️ REPLACE THESE TWO LINES with your own values from Part 1, Step 5
+    const SUPABASE_URL = 'https://musexmeqkdkxlqvlyjpo.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11c2V4bWVxa2RreGxxdmx5anBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODQyNTEsImV4cCI6MjA5MjA2MDI1MX0.sxL4ekXZM43cCH2IMuP6FFBVYlurh9d14cIskWPGXbA';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('contactForm');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+
+      const { error } = await supabase
+        .from('contacts')
+        .insert([{ name, email, message }]);
+
+      if (error) {
+        status.className = 'error';
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        status.className = 'success';
+        status.textContent = 'Thanks! We received your message.';
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
